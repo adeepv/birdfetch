@@ -1,6 +1,6 @@
 #/usr/bin/env python
+import os, sys
 
-import os
 
 BGPQ3=True
 SPOOLDIR="/var/tmp/birdfetch"
@@ -24,4 +24,3 @@ emailRecepient = ""
 emailSubject = "ripe exchange"
 emailEncoding = "UTF-8"
 emailRelay = ""
-

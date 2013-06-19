@@ -78,7 +78,8 @@ class ASGet:
 
     def BirdPrefixGet(self, currentAS=None, currentHostDescr=None):
         
-        sys.stderr.write("processing ...  => %s\n" % currentAS)
+        if DEBUG:
+            sys.stderr.write("processing ...  => %s\n" % currentAS)
         self.asListPrefix.append(self.bgpGenList(currentAS))
 
 
@@ -183,7 +184,9 @@ class ASGet:
             if lc >= 2:
                 diffList.append(line)
             lc += 1
-            
+        
+        if diffList is None or len(diffList) == 2:
+            return
         diffString = ""
         for diffLine in diffList:
             diffString += diffLine
@@ -213,7 +216,6 @@ class ASGet:
         self.diffOutStream += "Diff List:"
         if diffList is None or len(diffList) == 2:
             self.diffOutStream += " No differences\r\n"
-	    return
         else:
             self.diffOutStream += "\r\n"
             for i in diffList:
@@ -257,9 +259,9 @@ class ASGet:
     def bgpGenList(self, currentAS=None):
 
         if BGPQ3:
-            _asPrefixlist = subprocess.Popen(["/usr/local/bin/bgpq3", "-3", "-P", "-R 24", "-m 24", "-l%s" % currentAS,  currentAS], stdout = subprocess.PIPE)
+            _asPrefixlist = subprocess.Popen(["/usr/local/bin/bgpq3",  "-3", "-P", "-R 24", "-m 24", "-l%s" % currentAS,  currentAS], stdout = subprocess.PIPE)
         else:
-            _asPrefixlist = subprocess.Popen(["/usr/bin/bgpq", "-H", "-P", "-c", "-q", "-A", "-R 24", "-l%s" % currentAS,  currentAS], stdout = subprocess.PIPE)
+            _asPrefixlist = subprocess.Popen(["/usr/bin/bgpq", "-H", "-P", "-c", "-q", "-A", "-R 24", "-m 24", "-l%s" % currentAS,  currentAS], stdout = subprocess.PIPE)
         asPrefixlist = _asPrefixlist.stdout.read().splitlines()
         out = []
         _out = ""
@@ -301,7 +303,6 @@ class ASGet:
         if (len(attachSet) > 0):
             for i in attachSet:
                 message.attach(i)
-
         sender = mailer.Mailer(self.emailRelay)
         try:
             sender.send(message)
